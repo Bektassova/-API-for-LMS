@@ -13,22 +13,22 @@ if($_SERVER["REQUEST_METHOD"] != "DELETE"){
 
 include_once("../../includes/initialize.php");
 
-$user = new User($db);
+$comment = new Comment($db);
 
 // check if id is provided
 if(isset($_GET["id"])){
-    $user->id = $_GET["id"];
+    $comment->id = $_GET["id"];
 } else {
     http_response_code(400);
-    echo json_encode(array("message" => "User ID was not provided."));
+    echo json_encode(array("message" => "Comment ID was not provided."));
     die();
 }
 
-if($user->delete()){
+if($comment->delete()){
     http_response_code(200);
-    echo json_encode(array("message" => "User deleted."));
+    echo json_encode(array("message" => "Comment deleted."));
 } else {
     http_response_code(503);
-    echo json_encode(array("message" => "User not deleted."));
+    echo json_encode(array("message" => "Comment not deleted."));
 }
 ?>

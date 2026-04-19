@@ -1,48 +1,34 @@
 <?php
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: PUT");
-
 header("Access-Control-Allow-Headers: Access-Control-Allow-Origin, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With");
-
 
 include_once("../../includes/initialize.php");
 
-// Create a new instance of the User class
-// This allows us to use its structure and functions
 $user = new User($db);
 
-// read submitted json data from request body 
 $data = json_decode(file_get_contents("php://input"));
 
-// fill in user instance properties with decoded values from request
-$user->id =$data->id;
+// check if data is missing
+if(!$data || !isset($data->id, $data->username, $data->firstName, $data->lastName, $data->age)){
+    http_response_code(400);
+    echo json_encode(array("message" => "Missing required fields: id, username, firstName, lastName, age"));
+    exit;
+}
+
+$user->id = $data->id;
 $user->username = $data->username;
 $user->firstName = $data->firstName;
 $user->lastName = $data->lastName;
 $user->age = $data->age;
 
 if($user->update()){
+    http_response_code(200);
     echo json_encode(array("message" => "User updated."));
-}
-else{
+} else {
+    http_response_code(503);
     echo json_encode(array("message" => "User not updated."));
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ?>

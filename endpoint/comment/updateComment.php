@@ -11,12 +11,21 @@ $comment = new Comment($db);
 
 $data = json_decode(file_get_contents("php://input"));
 
+// check if data is missing
+if(!$data || !isset($data->id, $data->comment)){
+    http_response_code(400);
+    echo json_encode(array("message" => "Missing required fields: id, comment"));
+    exit;
+}
+
 $comment->id = $data->id;
 $comment->comment = $data->comment;
 
 if($comment->updateComment()){
+    http_response_code(200);
     echo json_encode(array("message" => "Comment updated."));
 } else {
+    http_response_code(503);
     echo json_encode(array("message" => "Comment not updated."));
 }
 ?>

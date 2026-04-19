@@ -1,7 +1,9 @@
 <?php
+
 header("Access-Control-Allow-Origin: *");
 header("Content-Type: application/json");
 header("Access-Control-Allow-Methods: GET");
+header("Access-Control-Allow-Headers: Access-Control-Allow-Origin, Content-Type, Access-Control-Allow-Methods, Authorization, X-Requested-With");
 
 include_once("../../includes/initialize.php");
 
@@ -13,26 +15,20 @@ $users_list['data'] = array();
 
 while($row = $result->fetch(PDO::FETCH_ASSOC)){
     $user_item = array(
-        'id' => $row['id'],
-        'username' => $row['username'],
+        'id'        => $row['id'],
+        'username'  => $row['username'],
         'firstName' => $row['firstName'],
-        'lastName' => $row['lastName'],
-        'age' => $row['age']
+        'lastName'  => $row['lastName'],
+        'age'       => $row['age']
     );
     array_push($users_list['data'], $user_item);
 }
 
 if(count($users_list['data']) > 0){
+    http_response_code(200);
     echo json_encode($users_list);
-}else{
+} else {
+    http_response_code(404);
     echo json_encode(array('message' => 'No users found.'));
 }
-?>
-
-
-
-
-
-
-
 ?>

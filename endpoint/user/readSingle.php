@@ -9,20 +9,28 @@ include_once("../../includes/initialize.php");
 
 $user = new User($db);
 
-$user->id = isset($_GET["id"]) ? $_GET["id"] : die();
+// check if id is provided
+if(!isset($_GET["id"])){
+    http_response_code(400);
+    echo json_encode(array("message" => "Missing required field: id"));
+    exit;
+}
 
+$user->id = $_GET["id"];
 $user->readSingle();
 
 if($user->username){
+    http_response_code(200);
     $user_info = array(
-        'id' => $user->id,
-        'username' => $user->username,
+        'id'        => $user->id,
+        'username'  => $user->username,
         'firstName' => $user->firstName,
-        'lastName' => $user->lastName,
-        'age' => $user->age,
+        'lastName'  => $user->lastName,
+        'age'       => $user->age,
     );
     echo json_encode($user_info);
 } else {
-    echo json_encode(array("message" => "No users found."));
+    http_response_code(404);
+    echo json_encode(array("message" => "No user found."));
 }
 ?>
