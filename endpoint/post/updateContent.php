@@ -21,7 +21,7 @@ if(!$data || !isset($data->id, $data->content)){
 $post->id = $data->id;
 $post->content = $data->content;
 
-if($post->updateContent(){
+if($post->updateContent()){
     http_response_code(200);
     echo json_encode(array("message" => "Post content updated."));
 } else {

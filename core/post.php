@@ -7,14 +7,13 @@ class Post{
     private $table = "post";
     private $alias = "p";
 
-    // table fields 
+    // table fields
     public $id;
     public $title;
     public $content;
-    public $userId;
+    public $userid;
 
     // constructor with db connection
-    // a function that is triggered automatically when an instance of the class is created
     public function __construct($db){
         $this->conn = $db;
     }
@@ -26,9 +25,7 @@ class Post{
                     ORDER BY {$this->alias}.id DESC;";
 
         $stmt = $this->conn->prepare($query);
-
         $stmt->execute();
-
         return $stmt;
     }
 
@@ -44,49 +41,46 @@ class Post{
         $stmt->execute();
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        if ($row > 0){
-            $this->title      = $row["title"];
-            $this->content    = $row["content"];
-            $this->userId     = $row["userId"];
+        if($row){
+            $this->title  = $row["title"];
+            $this->content = $row["content"];
+            $this->userid = $row["userid"];
         }
 
         return $stmt;
     }
 
-    // Read all Post records created by a single User (based on UserId)
+    // Read all Post records by a single User
     public function readByUserId(){
         $query = "SELECT * 
                     FROM {$this->table} AS {$this->alias}
-                    WHERE {$this->alias}.userId = ?
+                    WHERE {$this->alias}.userid = ?
                     ORDER BY {$this->alias}.id DESC;";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->userId);
+        $stmt->bindParam(1, $this->userid);
         $stmt->execute();
 
         return $stmt;
     }
 
-    // Create a new Post record 
+    // Create a new Post record
     public function create(){
         $query = "INSERT INTO {$this->table}
-                    (title, content, userId)
-                    VALUES (:title,:content,:userId);";
+                    (title, content, userid)
+                    VALUES (:title,:content,:userid);";
 
         $stmt = $this->conn->prepare($query);
 
-        // clean up data sent by user/3rd party system (for security)
         $this->title = htmlspecialchars(strip_tags($this->title));
         $this->content = htmlspecialchars(strip_tags($this->content));
-        $this->userId = htmlspecialchars(strip_tags($this->userId));
+        $this->userid = htmlspecialchars(strip_tags($this->userid));
 
-        // bind parameters to sql statement
         $stmt->bindParam(":title", $this->title);
         $stmt->bindParam(":content", $this->content);
-        $stmt->bindParam(":userId", $this->userId);
+        $stmt->bindParam(":userid", $this->userid);
 
-        if($stmt->execute())
-        {
+        if($stmt->execute()){
             return true;
         }
 
@@ -99,25 +93,22 @@ class Post{
         $query = "UPDATE {$this->table}
                     SET title = :title,
                         content = :content,
-                        userId = :userId
+                        userid = :userid
                     WHERE id = :id;";
 
         $stmt = $this->conn->prepare($query);
 
-        // clean up data sent by user/3rd party system (for security)
         $this->id = htmlspecialchars(strip_tags($this->id));
         $this->title = htmlspecialchars(strip_tags($this->title));
         $this->content = htmlspecialchars(strip_tags($this->content));
-        $this->userId = htmlspecialchars(strip_tags($this->userId));
+        $this->userid = htmlspecialchars(strip_tags($this->userid));
 
-        // bind parameters to sql statement
         $stmt->bindParam(":id", $this->id);
         $stmt->bindParam(":title", $this->title);
         $stmt->bindParam(":content", $this->content);
-        $stmt->bindParam(":userId", $this->userId);
+        $stmt->bindParam(":userid", $this->userid);
 
-        if($stmt->execute())
-        {
+        if($stmt->execute()){
             return true;
         }
 
@@ -125,24 +116,43 @@ class Post{
         return false;
     }
 
-// Update User ID of a Post record
+    // Update userid of a Post record
     public function updateUserId(){
         $query = "UPDATE {$this->table}
-                    SET userId = :userId
+                    SET userid = :userid
                     WHERE id = :id;";
 
         $stmt = $this->conn->prepare($query);
 
-        // clean up data sent by user/3rd party system (for security)
         $this->id = htmlspecialchars(strip_tags($this->id));
-        $this->userId = htmlspecialchars(strip_tags($this->userId));
+        $this->userid = htmlspecialchars(strip_tags($this->userid));
 
-        // bind parameters to sql statement
         $stmt->bindParam(":id", $this->id);
-        $stmt->bindParam(":userId", $this->userId);
+        $stmt->bindParam(":userid", $this->userid);
 
-        if($stmt->execute())
-        {
+        if($stmt->execute()){
+            return true;
+        }
+
+        printf("Error %s. \n", $stmt->error);
+        return false;
+    }
+
+    // Update only content of a Post record
+    public function updateContent(){
+        $query = "UPDATE {$this->table}
+                    SET content = :content
+                    WHERE id = :id;";
+
+        $stmt = $this->conn->prepare($query);
+
+        $this->id = htmlspecialchars(strip_tags($this->id));
+        $this->content = htmlspecialchars(strip_tags($this->content));
+
+        $stmt->bindParam(":id", $this->id);
+        $stmt->bindParam(":content", $this->content);
+
+        if($stmt->execute()){
             return true;
         }
 
@@ -157,14 +167,11 @@ class Post{
 
         $stmt = $this->conn->prepare($query);
 
-        // clean up data sent by user/3rd party system (for security)
         $this->id = htmlspecialchars(strip_tags($this->id));
 
-        // bind parameters to sql statement
         $stmt->bindParam(":id", $this->id);
 
-        if($stmt->execute())
-        {
+        if($stmt->execute()){
             return true;
         }
 
