@@ -7,28 +7,27 @@ header("Access-Control-Allow-Headers: Access-Control-Allow-Origin, Content-Type,
 
 include_once("../../includes/initialize.php");
 
-$user = new User($db);
-$result = $user->read();
+$comment = new Comment($db);  // ← Comment, not User
+$result = $comment->read();   // ← needs read() method in Comment class
 
-$users_list = array();
-$users_list['data'] = array();
+$comments_list = array();
+$comments_list['data'] = array();
 
 while($row = $result->fetch(PDO::FETCH_ASSOC)){
-    $user_item = array(
-        'id'        => $row['id'],
-        'username'  => $row['username'],
-        'firstName' => $row['firstName'],
-        'lastName'  => $row['lastName'],
-        'age'       => $row['age']
+    $comment_item = array(
+        'id'      => $row['id'],
+       'content' => $row['comment'],
+        'userid'  => $row['userid'],
+        'postid'  => $row['postid']
     );
-    array_push($users_list['data'], $user_item);
+    array_push($comments_list['data'], $comment_item);
 }
 
-if(count($users_list['data']) > 0){
+if(count($comments_list['data']) > 0){
     http_response_code(200);
-    echo json_encode($users_list);
+    echo json_encode($comments_list);
 } else {
     http_response_code(404);
-    echo json_encode(array('message' => 'No users found.'));
+    echo json_encode(array('message' => 'No comments found.'));
 }
 ?>

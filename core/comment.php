@@ -127,6 +127,16 @@ public function delete(){
     printf("Error %s. \n", $stmt->error);
     return false;
 }
+// Read all Comments
+public function read(){
+    $query = "SELECT *
+                FROM {$this->table} AS {$this->alias}";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->execute();
+
+    return $stmt;
+}
 }
 
 ?>
